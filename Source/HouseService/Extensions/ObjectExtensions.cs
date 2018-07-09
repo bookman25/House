@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace HouseService.Extensions
 {
@@ -14,6 +15,10 @@ namespace HouseService.Extensions
         {
             var targetTime = DateTime.Parse(target).TimeOfDay;
             return date.TimeOfDay >= targetTime;
+        }
+
+        public static void Forget(this Task task)
+        {
         }
     }
 }

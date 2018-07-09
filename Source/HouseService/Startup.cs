@@ -9,12 +9,18 @@ using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using System.IO;
 using System;
+using Autofac;
+using HassSDK;
+using HouseService.AutomationBase;
+using HouseService.Automations;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.ApplicationInsights.Extensibility;
 
 namespace HouseService
 {
     public class Startup
     {
-        private AutomationEngine Engine { get; set; }
+        private IContainer ApplicationContainer { get; set; }
 
         public Startup(IConfiguration configuration)
         {
@@ -24,8 +30,9 @@ namespace HouseService
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public async void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            TelemetryConfiguration.Active.DisableTelemetry = true;
             var logFolder = Directory.CreateDirectory("logs");
             var logFileName = Path.Combine(logFolder.FullName, $"{DateTime.Now.ToString("HHmmss")}_.log");
             Log.Logger = new LoggerConfiguration()
@@ -44,12 +51,20 @@ namespace HouseService
 
             services.AddMvc();
 
-            Engine = new AutomationEngine(Configuration.GetSection("Hassio").Get<HassioOptions>());
-            await Engine.StartAsync(default);
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Populate(services);
+            containerBuilder.RegisterModule<AppModule>();
+
+            ApplicationContainer = containerBuilder.Build();
+            var provider = new AutofacServiceProvider(ApplicationContainer);
+
+            return provider;
+            //Engine = new AutomationEngine(Configuration.GetSection("Hassio").Get<HassioOptions>());
+            //await Engine.StartAsync(default);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime applicationLifetime)
         {
             if (env.IsDevelopment())
             {
@@ -64,6 +79,40 @@ namespace HouseService
             app.UseStaticFiles();
 
             app.UseMvc();
+
+            applicationLifetime.ApplicationStarted.Register(() => ApplicationContainer.Resolve<AutomationEngine>().StartAsync(default));
+        }
+    }
+
+    public class AppModule : Module
+    {
+        protected override void Load(ContainerBuilder services)
+        {
+            AddSingleton<HassClient>(services);
+            AddSingleton<SubscriptionClient>(services);
+            AddSingleton<HassService>(services);
+            AddSingleton<SensorService>(services);
+            AddSingleton<AutomationEngine>(services);
+
+            AddSingleton<Automation, KitchenLights>(services);
+            AddSingleton<Automation, UpstairsClimate>(services);
+            AddSingleton<Automation, DownstairsClimate>(services);
+        }
+
+        private void AddSingleton<TImplementation>(ContainerBuilder services)
+            where TImplementation : class
+        {
+            services.RegisterType<TImplementation>().SingleInstance();
+        }
+
+
+        private void AddSingleton<TService, TImplementation>(ContainerBuilder services)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            services.RegisterType<TImplementation>()
+               .As<TService>()
+               .SingleInstance();
         }
     }
 }

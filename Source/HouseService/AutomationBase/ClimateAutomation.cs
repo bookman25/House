@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using HouseService.DeviceTypes;
+using HouseService.Sensors;
 using HouseService.Services;
 
 namespace HouseService.AutomationBase
@@ -9,10 +10,10 @@ namespace HouseService.AutomationBase
     {
         private readonly Thermostat thermostat;
 
-        protected ClimateAutomation(HassService hass, string entityId)
+        protected ClimateAutomation(HassService hass, string entityId, GenericSensor sensor)
             : base(hass)
         {
-            thermostat = new Thermostat(hass, entityId);
+            thermostat = new Thermostat(hass, entityId, sensor);
         }
 
         protected virtual Task<long> GetCurrentTemperatureAsync()

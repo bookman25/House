@@ -14,8 +14,6 @@ namespace HassSDK
     {
         private HassClient Client { get; }
 
-        private readonly string _hassWebsocketUri;
-
         private bool _started;
 
         private ClientWebSocket _ws;
@@ -27,8 +25,6 @@ namespace HassSDK
         public SubscriptionClient(HassClient client)
         {
             Client = client;
-
-            _hassWebsocketUri = client.BaseUri + "/websocket";
         }
 
         public async Task StartAsync()
@@ -44,7 +40,7 @@ namespace HassSDK
             cancellationTokenSource = new CancellationTokenSource();
 
             _ws = new ClientWebSocket();
-            await _ws.ConnectAsync(new Uri(_hassWebsocketUri.Replace("http://", "ws://") + $"?api_password={Client.Password}"), default);
+            await _ws.ConnectAsync(new Uri((Client.BaseUri + "/websocket").Replace("http://", "ws://") + $"?api_password={Client.Password}"), default);
 
             Task.Run(() => ProcessAsync(cancellationTokenSource.Token));
 

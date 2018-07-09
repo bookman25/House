@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using HassSDK.Models;
+using HouseService.Extensions;
 using HouseService.Sensors;
 using HouseService.Services;
 
@@ -13,6 +14,8 @@ namespace HouseService.DeviceTypes
         public ImmutableDictionary<string, MotionSensor> MotionSensors { get; private set; } = ImmutableDictionary<string, MotionSensor>.Empty;
 
         private LightState currentLevels;
+
+        public bool IsOn { get; private set; }
 
         public LightGroup(HassService hass, string entityId)
             : base(hass, "light", entityId)
@@ -25,7 +28,12 @@ namespace HouseService.DeviceTypes
             MotionSensors = MotionSensors.SetItem(sensor.EntityId, sensor);
         }
 
-        private async void Sensor_OnChanged(object sender, EventData e)
+        private void Sensor_OnChanged(object sender, EventData e)
+        {
+            HandleSensorChangeAsync().Forget();
+        }
+
+        private async Task HandleSensorChangeAsync()
         {
             if (MotionSensors.Values.Any(i => i.IsActive))
             {
@@ -41,7 +49,7 @@ namespace HouseService.DeviceTypes
         {
             await Task.WhenAll(MotionSensors.Values.Select(i => i.RefreshAsync(Client)));
 
-            Sensor_OnChanged(null, null);
+            await HandleSensorChangeAsync();
         }
 
         public Task TurnOnAsync(int? brightness = null)
@@ -57,6 +65,7 @@ namespace HouseService.DeviceTypes
                 return;
             }
 
+            IsOn = true;
             state.EntityId = EntityId;
             var turnOn = domain.Services["turn_on"];
             await Client.Services.CallServiceAsync(turnOn, state);
@@ -69,7 +78,8 @@ namespace HouseService.DeviceTypes
             {
                 return;
             }
-            
+
+            IsOn = false;
             var turnOn = domain.Services["turn_off"];
             await Client.Services.CallServiceAsync(turnOn, new LightState { EntityId = EntityId, Transition = transition });
         }

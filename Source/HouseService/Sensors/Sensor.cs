@@ -14,12 +14,7 @@ namespace HouseService.Sensors
         public Sensor(SubscriptionClient subscriptionClient, [NotNull] string entityId)
         {
             EntityId = entityId;
-            Subscribe(subscriptionClient);
-        }
-
-        public void Subscribe(SubscriptionClient client)
-        {
-            client.Subscribe(EntityId, EventReceived);
+            subscriptionClient.Subscribe(EntityId, EventReceived);
         }
 
         private void EventReceived(EventData data)

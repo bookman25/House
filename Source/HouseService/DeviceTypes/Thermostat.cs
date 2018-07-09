@@ -1,15 +1,29 @@
 ﻿using System;
 using System.Threading.Tasks;
 using HassSDK.Models;
+using HouseService.Sensors;
 using HouseService.Services;
+using Serilog;
 
 namespace HouseService.DeviceTypes
 {
     public class Thermostat : Device
     {
-        public Thermostat(HassService hass, string entityId)
+        private readonly GenericSensor sensor;
+
+        public Thermostat(HassService hass, string entityId, GenericSensor sensor)
             : base(hass, "climate", entityId)
         {
+            if (sensor != null)
+            {
+                sensor.OnChanged += Sensor_OnChanged;
+            }
+        }
+
+        private async void Sensor_OnChanged(object sender, EventData e)
+        {
+            // TODO: HOLD
+            var target = await GetCurrentTargetTemperatureAsync();
         }
 
         public async Task<long> GetCurrentTargetTemperatureAsync()

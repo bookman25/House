@@ -10,6 +10,7 @@ using HouseService.AutomationBase;
 using HouseService.Automations;
 using HouseService.DeviceTypes;
 using HouseService.Sensors;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace HouseService.Services
@@ -18,32 +19,36 @@ namespace HouseService.Services
     {
         private HassClient Client { get; }
 
+        public HassioOptions Options { get; }
+
         private HassService HassService { get; }
 
         private SubscriptionClient SubscriptionClient { get; }
 
         private Timer Timer { get; set; }
 
-        private List<Automation> Services { get; }
+        private ImmutableArray<Automation> Automations { get; }
 
         public ImmutableDictionary<string, Sensor> Sensors { get; } = ImmutableDictionary<string, Sensor>.Empty;
 
-        public AutomationEngine(HassioOptions options)
+        public AutomationEngine(
+            HassClient client,
+            HassService hassService,
+            SubscriptionClient subscriptionClient,
+            IConfiguration configuration,
+            IEnumerable<Automation> automations)
         {
-            Client = new HassClient(options.Endpoint, options.Password);
-            SubscriptionClient = new SubscriptionClient(Client);
+            Client = client;
+            Options = configuration.GetSection("Hassio").Get<HassioOptions>();
+            SubscriptionClient = subscriptionClient;
+            HassService = HassService;
 
-            HassService = new HassService(Client);
-            Services = new List<Automation>()
-            {
-                new UpstairsClimate(HassService),
-                new KitchenLights(HassService, SubscriptionClient)
-            };
+            Automations = automations.ToImmutableArray();
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            var login = await Client.AuthenticateAsync();
+            var login = await Client.AuthenticateAsync(Options.Endpoint, Options.Password);
             if (!login)
             {
                 throw new InvalidOperationException("Not logged in!");
@@ -75,7 +80,7 @@ namespace HouseService.Services
 
             try
             {
-                await Task.WhenAll(Services.Select(i => i.UpdateAsync()));
+                await Task.WhenAll(Automations.Select(i => i.UpdateAsync()));
             }
             finally
             {

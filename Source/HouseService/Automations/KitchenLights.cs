@@ -3,17 +3,16 @@ using System.Threading.Tasks;
 using HassSDK;
 using HouseService.AutomationBase;
 using HouseService.Extensions;
-using HouseService.Sensors;
 using HouseService.Services;
 
 namespace HouseService.Automations
 {
     public class KitchenLights : LightAutomation
     {
-        public KitchenLights(HassService hass, SubscriptionClient subscriptionClient)
+        public KitchenLights(HassService hass, SubscriptionClient subscriptionClient, SensorService sensors)
             : base(hass, "light.kitchen")
         {
-            Light.AddMotionSensor(new MotionSensor(subscriptionClient, "sensor.aeotec_zw100_multisensor_6_burglar"));
+            Light.AddMotionSensor(sensors.KitchenMotionSensor);
         }
 
         public override async Task UpdateAsync()

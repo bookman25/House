@@ -9,8 +9,8 @@ namespace HouseService.Automations
 {
     public class UpstairsClimate : ClimateAutomation
     {
-        public UpstairsClimate(HassService hass)
-            : base(hass, "climate.linear_unknown_type5442_id5437_cooling_1")
+        public UpstairsClimate(HassService hass, SensorService sensors)
+            : base(hass, EntityIds.UpstairsThermostatCooling, sensors.UpstairsThermostat)
         {
         }
 
@@ -23,9 +23,13 @@ namespace HouseService.Automations
                 case DayOfWeek.Tuesday:
                 case DayOfWeek.Wednesday:
                 case DayOfWeek.Thursday:
-                    if (date.IsBefore("4:00am"))
+                    if (date.IsBefore("3:00am"))
                     {
                         await SetTemperatureAsync(74);
+                    }
+                    else if (date.IsBefore("4:00am"))
+                    {
+                        await SetTemperatureAsync(75);
                     }
                     else if (date.IsBefore("6:00am"))
                     {
@@ -37,7 +41,7 @@ namespace HouseService.Automations
                     }
                     else
                     {
-                        await SetTemperatureAsync(73);
+                        await SetTemperatureAsync(74);
                     }
                     break;
                 case DayOfWeek.Friday:
