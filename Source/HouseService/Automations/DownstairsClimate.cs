@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using HassSDK;
 using HouseService.AutomationBase;
+using HouseService.ElasticSearch;
 using HouseService.Extensions;
 using HouseService.Services;
 
@@ -9,13 +9,18 @@ namespace HouseService.Automations
 {
     public class DownstairsClimate : ClimateAutomation
     {
-        public DownstairsClimate(HassService hass, SensorService sensors)
-            : base(hass, EntityIds.DownstairsThermostatCooling, sensors.DownstairsThermostat)
+        private DownstairsThermostatIndex Index { get; }
+
+        public DownstairsClimate(HassService hass, SensorService sensors, DownstairsThermostatIndex index)
+            : base(hass, EntityIds.DownstairsThermostatCooling, sensors.DownstairsThermostat, index)
         {
+            Index = index;
         }
 
         public override async Task UpdateAsync()
         {
+            await base.UpdateAsync();
+
             var date = DateTime.Now;
             switch (date.DayOfWeek)
             {

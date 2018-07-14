@@ -5,10 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HassSDK;
-using HassSDK.Models;
 using HouseService.AutomationBase;
-using HouseService.Automations;
-using HouseService.DeviceTypes;
+using HouseService.ElasticSearch;
 using HouseService.Sensors;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -18,6 +16,8 @@ namespace HouseService.Services
     public class AutomationEngine : IHostedService, IDisposable
     {
         private HassClient Client { get; }
+
+        public ElasticSearchService ElasticSearch { get; }
 
         public HassioOptions Options { get; }
 
@@ -34,11 +34,13 @@ namespace HouseService.Services
         public AutomationEngine(
             HassClient client,
             HassService hassService,
+            ElasticSearchService elasticSearch,
             SubscriptionClient subscriptionClient,
             IConfiguration configuration,
             IEnumerable<Automation> automations)
         {
             Client = client;
+            ElasticSearch = elasticSearch;
             Options = configuration.GetSection("Hassio").Get<HassioOptions>();
             SubscriptionClient = subscriptionClient;
             HassService = HassService;
@@ -53,6 +55,8 @@ namespace HouseService.Services
             {
                 throw new InvalidOperationException("Not logged in!");
             }
+
+            await ElasticSearch.CreateIndexesAsync();
 
             await SubscriptionClient.StartAsync();
             Timer = new Timer(Refresh, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));

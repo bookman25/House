@@ -15,6 +15,7 @@ using HouseService.AutomationBase;
 using HouseService.Automations;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights.Extensibility;
+using HouseService.ElasticSearch;
 
 namespace HouseService
 {
@@ -97,6 +98,10 @@ namespace HouseService
             AddSingleton<Automation, KitchenLights>(services);
             AddSingleton<Automation, UpstairsClimate>(services);
             AddSingleton<Automation, DownstairsClimate>(services);
+
+            AddSingleton<ElasticSearchService>(services);
+            AddSingleton<ElasticIndex, DownstairsThermostatIndex, DownstairsThermostatIndex>(services);
+            AddSingleton<ElasticIndex, UpstairsThermostatIndex, UpstairsThermostatIndex>(services);
         }
 
         private void AddSingleton<TImplementation>(ContainerBuilder services)
@@ -105,13 +110,23 @@ namespace HouseService
             services.RegisterType<TImplementation>().SingleInstance();
         }
 
-
         private void AddSingleton<TService, TImplementation>(ContainerBuilder services)
             where TService : class
             where TImplementation : class, TService
         {
             services.RegisterType<TImplementation>()
                .As<TService>()
+               .SingleInstance();
+        }
+
+        private void AddSingleton<TService, TService2, TImplementation>(ContainerBuilder services)
+            where TService : class
+            where TService2 : class
+            where TImplementation : class, TService
+        {
+            services.RegisterType<TImplementation>()
+               .As<TService>()
+               .As<TService2>()
                .SingleInstance();
         }
     }
