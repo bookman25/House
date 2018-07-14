@@ -2,7 +2,8 @@
 using System.Threading.Tasks;
 using HassSDK;
 using HassSDK.Models;
-using HouseService.DeviceTypes;
+using HassSDK.Requests;
+using HouseService.Devices;
 using HouseService.Services;
 
 namespace HouseService.AutomationBase
@@ -24,12 +25,12 @@ namespace HouseService.AutomationBase
 
         protected Task TurnOnAsync(int? brightness = null, int? blueLevel = null, int? transition = null)
         {
-            return Light.TurnOnAsync(new LightState { Brightness = brightness, ColorTemp = BlueToColorTemp(blueLevel), Transition = transition });
+            return Light.TurnOnAsync(new LightChangeRequest { Brightness = brightness, ColorTemp = BlueToColorTemp(blueLevel), Transition = transition });
         }
 
         protected async Task ChangeLevelsAsync(int? brightness = null, int? blueLevel = null, int? transition = null)
         {
-            await Light.ChangeLevelsAsync(new LightState { Brightness = brightness, ColorTemp = BlueToColorTemp(blueLevel), Transition = transition });
+            await Light.ChangeLevelsAsync(new LightChangeRequest { Brightness = brightness, ColorTemp = BlueToColorTemp(blueLevel), Transition = transition });
         }
 
         private int? BlueToColorTemp(int? bluePercent)

@@ -5,58 +5,73 @@ using Newtonsoft.Json.Linq;
 
 namespace HassSDK.Models
 {
-    public class Entity
+    public abstract class Entity
     {
-        [NotNull]
-        public string EntityId { get; }
+        public string EntityId { get; set; }
 
-        public int? NodeId { get; }
+        public DateTime LastChanged { get; set; }
 
-        public string FriendlyName { get; }
+        public DateTime LastUpdated { get; set; }
 
-        public string State { get; }
+        public int? NodeId { get; set; }
 
-        public DateTime LastChanged { get; }
+        public string FriendlyName { get; set; }
 
-        public DateTime LastUpdated { get; }
+        public string State { get; set; }
 
-        private readonly ImmutableDictionary<string, object> attributes;
-
-        public Entity(
-            [NotNull] string entityId,
-            int? nodeId,
-            string friendlyName,
-            string state,
-            DateTime lastChanged,
-            DateTime lastUpdated,
-            JToken attributes)
-        {
-            EntityId = entityId;
-            NodeId = nodeId;
-            FriendlyName = friendlyName;
-            State = state;
-            LastChanged = lastChanged;
-            LastUpdated = lastUpdated;
-
-            this.attributes = attributes.OfType<JProperty>().ToImmutableDictionary(i => i.Name, i => i.Value.ToObject<object>());
-        }
+        public ImmutableDictionary<string, object> Attributes { get; set; }
 
         public T GetAttribute<T>(string key)
         {
-            return (T)attributes[key];
+            return (T)Attributes[key];
         }
 
-        public static Entity FromJson(JToken json)
+        protected virtual void SetProperties(JToken json)
         {
-            var attr = json["attributes"];
-            var nodeId = attr.Value<int>("node_id");
-            var name = attr.Value<string>("friendly_name");
-            var id = json["entity_id"].ToObject<string>();
-            var lastChanged = json["last_changed"].ToObject<DateTime>();
-            var lastUpdated = json["last_updated"].ToObject<DateTime>();
-            var state = json["state"].ToObject<string>();
+            EntityId = json["entity_id"].Value<string>();
+            State = json["state"].Value<string>();
+            LastChanged = json["last_changed"].Value<DateTime>();
+            LastUpdated = json["last_updated"].Value<DateTime>();
 
-            return new Entity(Constraint.NotNull(id, "entityId"), nodeId, name, state, lastChanged, lastUpdated, attr);
+            var builder = ImmutableDictionary.CreateBuilder<string, object>();
+            foreach (var property in json["attributes"].Cast<JProperty>())
+            {
+                switch (property.Value)
+                {
+                    case JValue val:
+                        builder.Add(property.Name, ((JValue)property.Value).Value);
+                        break;
+                    case JArray array:
+                        builder.Add(property.Name, array);
+                        break;
+                    default:
+                        throw new NotImplementedException($"Json value type not handled: {property.Value.GetType()}");
+                }
+            }
+
+            Attributes = builder.ToImmutable();
+            FriendlyName = (string)builder["friendly_name"];
+            Attributes.TryGetValue("node_id", out var nodeId);
+            NodeId = nodeId as int?;
         }
+
+        public static GenericEntity CreateGenericEntity(JToken json)
+        {
+            var entity = new GenericEntity();
+            entity.SetProperties(json);
+            return entity;
+        }
+
+        public static T FromJson<T>(JToken json)
+            where T : Entity, new()
+        {
+            var entity = new T();
+            entity.SetProperties(json);
+            return entity;
+        }
+    }
+
+    public class GenericEntity : Entity
+    {
     }
 }

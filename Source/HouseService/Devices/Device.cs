@@ -4,7 +4,7 @@ using HassSDK;
 using HassSDK.Models;
 using HouseService.Services;
 
-namespace HouseService.DeviceTypes
+namespace HouseService.Devices
 {
     public abstract class Device
     {

@@ -17,29 +17,39 @@ namespace HassSDK.Entities
         {
         }
 
-        public async Task<ImmutableDictionary<string, Entity>> GetAsync()
+        public async Task<ImmutableDictionary<string, GenericEntity>> GetAsync()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, Client.BaseUri + "/states");
             var response = await Client.HttpClient.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
             var jobject = JArray.Parse(content);
 
-            var result = new List<Entity>();
+            var result = new List<GenericEntity>();
             foreach (var item in jobject)
             {
-                result.Add(Entity.FromJson(item));
+                result.Add(Entity.CreateGenericEntity(item));
             }
 
             return result.ToImmutableDictionary(i => i.EntityId);
         }
 
-        public async Task<Entity> GetEntityAsync(string entityId)
+        public async Task<GenericEntity> GetEntityAsync(string entityId)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, Client.BaseUri + "/states/" + entityId);
             var response = await Client.HttpClient.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
             var jobject = JObject.Parse(content);
-            return Entity.FromJson(jobject);
+            return Entity.CreateGenericEntity(jobject);
+        }
+
+        public async Task<T> GetEntityAsync<T>(string entityId)
+            where T : Entity, new()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, Client.BaseUri + "/states/" + entityId);
+            var response = await Client.HttpClient.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+            var jobject = JObject.Parse(content);
+            return Entity.FromJson<T>(jobject);
         }
     }
 }

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using HassSDK.Models;
+using HassSDK.Requests;
 using HouseService.Sensors;
 using HouseService.Services;
 using Serilog;
 
-namespace HouseService.DeviceTypes
+namespace HouseService.Devices
 {
     public class Thermostat : Device
     {
@@ -26,10 +27,15 @@ namespace HouseService.DeviceTypes
             var target = await GetCurrentTargetTemperatureAsync();
         }
 
+        public Task<ThermostatEntity> GetCurrentStateAsync()
+        {
+            return Client.States.GetEntityAsync<ThermostatEntity>(EntityId);
+        }
+
         public async Task<long> GetCurrentTargetTemperatureAsync()
         {
-            var entity = await Client.States.GetEntityAsync(EntityId);
-            return entity.GetAttribute<long>("temperature");
+            var entity = await Client.States.GetEntityAsync<ThermostatEntity>(EntityId);
+            return entity.TargetTemperature;
         }
 
         public async Task<long> GetCurrentTemperatureAsync()
@@ -53,7 +59,7 @@ namespace HouseService.DeviceTypes
             }
 
             var setTemp = domain.Services["set_temperature"];
-            await Client.Services.CallServiceAsync(setTemp, new ThermostatState { EntityId = EntityId, Temperature = temp });
+            await Client.Services.CallServiceAsync(setTemp, new ThermostatChangeRequest { EntityId = EntityId, TargetTemperature = temp });
         }
     }
 }

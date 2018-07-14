@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace HassSDK.Models
+namespace HassSDK.Requests
 {
     public class EntityRequest
     {

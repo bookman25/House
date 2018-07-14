@@ -3,17 +3,18 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using HassSDK.Models;
+using HassSDK.Requests;
 using HouseService.Extensions;
 using HouseService.Sensors;
 using HouseService.Services;
 
-namespace HouseService.DeviceTypes
+namespace HouseService.Devices
 {
     public class LightGroup : Device
     {
         public ImmutableDictionary<string, MotionSensor> MotionSensors { get; private set; } = ImmutableDictionary<string, MotionSensor>.Empty;
 
-        private LightState currentLevels;
+        private LightChangeRequest currentLevels;
 
         public bool IsOn { get; private set; }
 
@@ -54,10 +55,10 @@ namespace HouseService.DeviceTypes
 
         public Task TurnOnAsync(int? brightness = null)
         {
-            return TurnOnAsync(new LightState { EntityId = EntityId, Brightness = brightness });
+            return TurnOnAsync(new LightChangeRequest { EntityId = EntityId, Brightness = brightness });
         }
 
-        public async Task TurnOnAsync(LightState state)
+        public async Task TurnOnAsync(LightChangeRequest state)
         {
             var domain = await GetDomainAsync();
             if (domain == null)
@@ -81,10 +82,10 @@ namespace HouseService.DeviceTypes
 
             IsOn = false;
             var turnOn = domain.Services["turn_off"];
-            await Client.Services.CallServiceAsync(turnOn, new LightState { EntityId = EntityId, Transition = transition });
+            await Client.Services.CallServiceAsync(turnOn, new LightChangeRequest { EntityId = EntityId, Transition = transition });
         }
 
-        public async Task ChangeLevelsAsync(LightState state)
+        public async Task ChangeLevelsAsync(LightChangeRequest state)
         {
             currentLevels = state;
             await RefreshSensorsAsync();

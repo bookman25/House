@@ -1,9 +1,9 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace HassSDK.Models
+namespace HassSDK.Requests
 {
-    public class LightState : EntityRequest
+    public class LightChangeRequest : EntityRequest
     {
         [JsonProperty("brightness")]
         public int? Brightness { get; set; }
@@ -20,9 +20,9 @@ namespace HassSDK.Models
         [JsonProperty("transition")]
         public int? Transition { get; set; }
 
-        public LightState WithTransition(int? transition)
+        public LightChangeRequest WithTransition(int? transition)
         {
-            return new LightState { Brightness = Brightness, ColorTemp = ColorTemp, WhiteValue = WhiteValue, Transition = transition };
+            return new LightChangeRequest { Brightness = Brightness, ColorTemp = ColorTemp, WhiteValue = WhiteValue, Transition = transition };
         }
     }
 }
