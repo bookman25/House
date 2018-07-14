@@ -34,21 +34,6 @@ namespace HouseService
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             TelemetryConfiguration.Active.DisableTelemetry = true;
-            var logFolder = Directory.CreateDirectory("logs");
-            var logFileName = Path.Combine(logFolder.FullName, $"{DateTime.Now.ToString("HHmmss")}_.log");
-            Log.Logger = new LoggerConfiguration()
-                            .MinimumLevel.Information()
-                            .WriteTo.File(logFileName,
-                                                    outputTemplate: "{Timestamp:yyyy-MM-dd'T'HH:mm:ss.fff}|{Level}|{RequestId}{Message}{NewLine}{Exception}",
-                                                    flushToDiskInterval: new TimeSpan(0, 10, 0),
-                                                    fileSizeLimitBytes: 10 * 1024 * 1024,
-                                                    rollOnFileSizeLimit: true,
-                                                    retainedFileCountLimit: 5,
-                                                    rollingInterval: RollingInterval.Day,
-                                                    shared: true)
-                            .WriteTo.Console()
-                            .Enrich.FromLogContext()
-                            .CreateLogger();
 
             services.AddMvc();
 

@@ -10,6 +10,7 @@ using HouseService.ElasticSearch;
 using HouseService.Sensors;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace HouseService.Services
 {
@@ -25,6 +26,8 @@ namespace HouseService.Services
 
         private SubscriptionClient SubscriptionClient { get; }
 
+        private ILogger<AutomationEngine> Logger { get; }
+
         private Timer Timer { get; set; }
 
         private ImmutableArray<Automation> Automations { get; }
@@ -37,12 +40,14 @@ namespace HouseService.Services
             ElasticSearchService elasticSearch,
             SubscriptionClient subscriptionClient,
             IConfiguration configuration,
-            IEnumerable<Automation> automations)
+            IEnumerable<Automation> automations,
+            ILogger<AutomationEngine> logger)
         {
             Client = client;
             ElasticSearch = elasticSearch;
             Options = configuration.GetSection("Hassio").Get<HassioOptions>();
             SubscriptionClient = subscriptionClient;
+            Logger = logger;
             HassService = HassService;
 
             Automations = automations.ToImmutableArray();
@@ -56,6 +61,7 @@ namespace HouseService.Services
                 throw new InvalidOperationException("Not logged in!");
             }
 
+            Logger.LogInformation("Starting engine...");
             await ElasticSearch.CreateIndexesAsync();
 
             await SubscriptionClient.StartAsync();

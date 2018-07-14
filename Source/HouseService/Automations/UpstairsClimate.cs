@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Threading.Tasks;
-using HassSDK;
 using HouseService.AutomationBase;
 using HouseService.ElasticSearch;
 using HouseService.Extensions;
 using HouseService.Services;
+using Microsoft.Extensions.Logging;
 
 namespace HouseService.Automations
 {
     public class UpstairsClimate : ClimateAutomation
     {
-        public UpstairsClimate(HassService hass, SensorService sensors, UpstairsThermostatIndex index)
-            : base(hass, EntityIds.UpstairsThermostatCooling, sensors.UpstairsThermostat, index)
+        public override string Name { get; } = "Upstairs Thermostat";
+
+        public UpstairsClimate(HassService hass, SensorService sensors, UpstairsThermostatIndex index, ILogger<UpstairsClimate> logger)
+            : base(hass, EntityIds.UpstairsThermostatCooling, sensors.UpstairsThermostat, index, logger)
         {
         }
 
-        public override async Task UpdateAsync()
+        protected override int GetTimeBasedTargetTemperature()
         {
-            await base.UpdateAsync();
-
             var date = DateTime.Now;
             switch (date.DayOfWeek)
             {
@@ -28,52 +27,50 @@ namespace HouseService.Automations
                 case DayOfWeek.Thursday:
                     if (date.IsBefore("3:00am"))
                     {
-                        await SetTemperatureAsync(74);
+                        return 74;
                     }
                     else if (date.IsBefore("4:00am"))
                     {
-                        await SetTemperatureAsync(75);
+                        return 75;
                     }
                     else if (date.IsBefore("6:00am"))
                     {
-                        await SetTemperatureAsync(78);
+                        return 78;
                     }
                     else if (date.IsBefore("8:30pm"))
                     {
-                        await SetTemperatureAsync(80);
+                        return 80;
                     }
                     else
                     {
-                        await SetTemperatureAsync(74);
+                        return 74;
                     }
-                    break;
                 case DayOfWeek.Friday:
                     if (date.IsBefore("3:00am"))
                     {
-                        await SetTemperatureAsync(74);
+                        return 74;
                     }
                     else if (date.IsBefore("6:00am"))
                     {
-                        await SetTemperatureAsync(78);
+                        return 78;
                     }
                     else
                     {
-                        await SetTemperatureAsync(80);
+                        return 80;
                     }
-                    break;
                 case DayOfWeek.Saturday:
-                    await SetTemperatureAsync(80);
-                    break;
+                    return 80;
                 case DayOfWeek.Sunday:
                     if (date.IsBefore("8:30pm"))
                     {
-                        await SetTemperatureAsync(80);
+                        return 80;
                     }
                     else
                     {
-                        await SetTemperatureAsync(73);
+                        return 73;
                     }
-                    break;
+                default:
+                    throw new InvalidOperationException("Unknown DayOfWeek");
             }
         }
     }
