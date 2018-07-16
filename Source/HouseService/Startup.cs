@@ -83,6 +83,7 @@ namespace HouseService
             AddSingleton<Automation, KitchenLights>(services);
             AddSingleton<Automation, UpstairsClimate>(services);
             AddSingleton<Automation, DownstairsClimate>(services);
+            AddSingleton<Automation, LivingRoomLights>(services);
 
             AddSingleton<ElasticSearchService>(services);
             AddSingleton<ElasticIndex, DownstairsThermostatIndex, DownstairsThermostatIndex>(services);

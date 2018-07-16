@@ -22,5 +22,14 @@ namespace HouseService
 
         [NotNull]
         public const string KitchenTemperatureSensor = "sensor.aeotec_zw100_multisensor_6_temperature";
+
+        [NotNull]
+        public const string KitchenLight = "light.kitchen";
+
+        [NotNull]
+        public const string PantryLight = "light.pantry";
+
+        [NotNull]
+        public const string LivingRoomLight = "light.living_room";
     }
 }

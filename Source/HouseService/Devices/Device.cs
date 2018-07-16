@@ -14,7 +14,7 @@ namespace HouseService.Devices
 
         protected string DomainKey { get; }
 
-        protected string EntityId { get; }
+        public string EntityId { get; }
 
         protected Device(HassService hass, string domain, string entityId)
         {
