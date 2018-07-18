@@ -6,15 +6,11 @@ namespace HouseService.Services
 {
     public class SensorService
     {
-        private SubscriptionClient SubscriptionClient { get; }
-
-        public SensorService(SubscriptionClient subscriptionClient)
+        public SensorService(HassService hass)
         {
-            SubscriptionClient = subscriptionClient;
-
-            KitchenMotionSensor = new MotionSensor(SubscriptionClient, EntityIds.KitchenMotionSensor);
-            DownstairsThermostat = new GenericSensor(SubscriptionClient, EntityIds.DownstairsThermostat);
-            UpstairsThermostat = new GenericSensor(SubscriptionClient, EntityIds.UpstairsThermostat);
+            KitchenMotionSensor = new MotionSensor(hass, EntityIds.KitchenMotionSensor);
+            DownstairsThermostat = new GenericSensor(hass, EntityIds.DownstairsThermostat);
+            UpstairsThermostat = new GenericSensor(hass, EntityIds.UpstairsThermostat);
         }
 
         public MotionSensor KitchenMotionSensor { get; }

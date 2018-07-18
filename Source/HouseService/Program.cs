@@ -19,7 +19,7 @@ namespace HouseService
                             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                             .Enrich.FromLogContext()
                             .WriteTo.File(logFileName,
-                                                    outputTemplate: "{Timestamp:yyyy-MM-dd'T'HH:mm:ss.fff}|{Level}|[{SourceContext:1}]{Message}{NewLine}{Exception}",
+                                                    outputTemplate: "{Timestamp:yyyy-MM-dd'T'HH:mm:ss.fff}|{Level}|[{SourceContext:1}]{RequestId}{Message}{NewLine}{Exception}",
                                                     flushToDiskInterval: new TimeSpan(0, 10, 0),
                                                     fileSizeLimitBytes: 10 * 1024 * 1024,
                                                     rollOnFileSizeLimit: true,

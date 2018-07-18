@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using HassSDK;
 using HassSDK.Models;
 using HassSDK.Requests;
 using HouseService.Sensors;
@@ -9,9 +10,7 @@ namespace HouseService.Devices
 {
     public class Thermostat : Device
     {
-        private readonly GenericSensor sensor;
-
-        public Thermostat(HassService hass, string entityId, GenericSensor sensor)
+        public Thermostat(HassService hass, [NotNull] string entityId)
             : base(hass, "climate", entityId)
         {
         }
@@ -41,15 +40,7 @@ namespace HouseService.Devices
                 return false;
             }
 
-            var domain = await GetDomainAsync();
-            if (domain == null)
-            {
-                return false;
-            }
-
-            var setTemp = domain.Services["set_temperature"];
-            await Client.Services.CallServiceAsync(setTemp, new ThermostatChangeRequest { EntityId = EntityId, TargetTemperature = temp });
-            return true;
+            return await ExecuteServiceAsync("set_temperature", new ThermostatChangeRequest(EntityId, temp));
         }
     }
 }

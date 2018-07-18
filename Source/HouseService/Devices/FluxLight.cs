@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using HassSDK;
 using HassSDK.Requests;
 using HouseService.Services;
 
@@ -7,20 +8,14 @@ namespace HouseService.Devices
 {
     public class FluxLight : LightGroup
     {
-        public FluxLight(HassService hass, string entityId)
+        public FluxLight(HassService hass, [NotNull] string entityId)
             : base(hass, entityId)
         {
         }
 
         public Task ChangeLevelsAsync(int? brightness = null, int? blueLevel = null, int? transitionTime = null)
         {
-            var request = new LightChangeRequest
-            {
-                EntityId = EntityId,
-                Brightness = brightness,
-                ColorTemp = BlueToColorTemp(blueLevel),
-                Transition = transitionTime
-            };
+            var request = new LightChangeRequest(EntityId, BlueToColorTemp(blueLevel), brightness, transitionTime);
             return ChangeLevelsAsync(request);
         }
 

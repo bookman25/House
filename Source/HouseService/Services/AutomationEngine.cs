@@ -49,6 +49,7 @@ namespace HouseService.Services
             SubscriptionClient = subscriptionClient;
             Logger = logger;
             HassService = HassService;
+            LogHelper.DefaultLogger = logger;
 
             Automations = automations.ToImmutableArray();
         }
@@ -90,7 +91,10 @@ namespace HouseService.Services
 
             try
             {
-                await Task.WhenAll(Automations.Select(i => i.UpdateAsync()));
+                using (LogHelper.PushRequestId("Main"))
+                {
+                    await Task.WhenAll(Automations.Where(i => i.IsEnabled).Select(i => i.UpdateAsync()));
+                }
             }
             finally
             {

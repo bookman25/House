@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using HassSDK;
 using HassSDK.Models;
+using HouseService.Services;
 
 namespace HouseService.Sensors
 {
@@ -13,8 +14,8 @@ namespace HouseService.Sensors
 
         private DateTime lastUpdate;
 
-        public MotionSensor(SubscriptionClient subscriptionClient, [NotNull] string entityId, int threshold = 3)
-            : base(subscriptionClient, entityId)
+        public MotionSensor(HassService hass, [NotNull] string entityId, int threshold = 3)
+            : base(hass, entityId)
         {
             Threshold = threshold;
 

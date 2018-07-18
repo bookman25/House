@@ -1,6 +1,7 @@
 ﻿using System;
 using HassSDK;
 using HassSDK.Models;
+using HouseService.Services;
 
 namespace HouseService.Sensors
 {
@@ -11,10 +12,10 @@ namespace HouseService.Sensors
 
         public event EventHandler<EventData> OnChanged;
 
-        public Sensor(SubscriptionClient subscriptionClient, [NotNull] string entityId)
+        public Sensor(HassService hass, [NotNull] string entityId)
         {
             EntityId = entityId;
-            subscriptionClient.Subscribe(EntityId, EventReceived);
+            hass.Subscribe(EntityId, EventReceived);
         }
 
         private void EventReceived(EventData data)

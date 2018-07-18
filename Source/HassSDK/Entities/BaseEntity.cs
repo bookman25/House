@@ -7,9 +7,10 @@ namespace HassSDK.Entities
 {
     public abstract class BaseEntity
     {
+        [NotNull]
         protected HassClient Client { get; }
 
-        public BaseEntity(HassClient client)
+        public BaseEntity([NotNull] HassClient client)
         {
             Client = client;
         }

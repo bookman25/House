@@ -16,6 +16,8 @@ namespace HouseService.AutomationBase
             HassService = hass;
         }
 
+        public bool IsEnabled { get; set; } = true;
+
         public abstract Task UpdateAsync();
     }
 }

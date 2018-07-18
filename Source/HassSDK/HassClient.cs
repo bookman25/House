@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using HassSDK.Entities;
+using Newtonsoft.Json;
 
 namespace HassSDK
 {
@@ -16,6 +17,8 @@ namespace HassSDK
         internal string BaseUri { get; private set; }
 
         internal string Password { get; private set; }
+
+        internal readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
 
         public HassClient()
         {

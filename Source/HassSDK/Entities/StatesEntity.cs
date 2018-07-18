@@ -12,7 +12,7 @@ namespace HassSDK.Entities
 {
     public class StatesEntity : BaseEntity
     {
-        public StatesEntity(HassClient client)
+        public StatesEntity([NotNull] HassClient client)
             : base(client)
         {
         }

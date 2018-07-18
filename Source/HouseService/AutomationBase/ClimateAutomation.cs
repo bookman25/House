@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using HassSDK;
 using HassSDK.Models;
 using HouseService.Devices;
 using HouseService.ElasticSearch;
@@ -19,14 +20,14 @@ namespace HouseService.AutomationBase
 
         protected ILogger Logger { get; }
 
-        private TimeSpan HoldDuration { get; } = TimeSpan.FromMinutes(30);
+        private TimeSpan HoldDuration { get; } = TimeSpan.FromMinutes(60);
 
-        protected ClimateAutomation(HassService hass, string entityId, GenericSensor sensor, ElasticIndex index, ILogger logger)
+        protected ClimateAutomation(HassService hass, [NotNull] string entityId, GenericSensor sensor, ElasticIndex index, ILogger logger)
             : base(hass)
         {
             Index = index;
             Logger = logger;
-            Thermostat = new Thermostat(hass, entityId, sensor);
+            Thermostat = new Thermostat(hass, entityId);
 
             sensor.OnChanged += Sensor_OnChanged;
         }

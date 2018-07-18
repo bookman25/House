@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using HassSDK;
-using HassSDK.Models;
+using HassSDK.Requests;
 using HouseService.Services;
+using Microsoft.Extensions.Logging;
 
 namespace HouseService.Devices
 {
@@ -14,18 +15,26 @@ namespace HouseService.Devices
 
         protected string DomainKey { get; }
 
+        [NotNull]
         public string EntityId { get; }
 
-        protected Device(HassService hass, string domain, string entityId)
+        protected Device(HassService hass, string domain, [NotNull] string entityId)
         {
             HassService = hass;
             DomainKey = domain;
             EntityId = entityId;
         }
 
-        public Task<Domain> GetDomainAsync()
+        public async Task<bool> ExecuteServiceAsync(string serviceName, EntityRequest request)
         {
-            return HassService.GetDomainAsync(DomainKey);
+            var domain = await HassService.GetDomainAsync(DomainKey);
+            if (domain == null)
+            {
+                return false;
+            }
+
+            LogHelper.DefaultLogger.LogTrace($"Calling {request.EntityId}.{serviceName}");
+            return await domain.GetService(serviceName).ExecuteAsync(request);
         }
     }
 }
