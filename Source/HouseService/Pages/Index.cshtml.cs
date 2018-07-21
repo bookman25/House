@@ -11,7 +11,6 @@ namespace HouseService.Pages
     {
         public void OnGet()
         {
-
         }
     }
 }
