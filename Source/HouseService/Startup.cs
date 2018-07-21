@@ -16,6 +16,7 @@ using HouseService.Automations;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights.Extensibility;
 using HouseService.ElasticSearch;
+using HouseService.ViewModels;
 
 namespace HouseService
 {
@@ -88,6 +89,8 @@ namespace HouseService
             AddSingleton<ElasticSearchService>(services);
             AddSingleton<ElasticIndex, DownstairsThermostatIndex, DownstairsThermostatIndex>(services);
             AddSingleton<ElasticIndex, UpstairsThermostatIndex, UpstairsThermostatIndex>(services);
+
+            AddSingleton<WebViewModel>(services);
         }
 
         private void AddSingleton<TImplementation>(ContainerBuilder services)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using HassSDK;
 using HouseService.AutomationBase;
@@ -22,7 +23,11 @@ namespace HouseService.Automations
 
             pantryLight = new FluxLight(hass, EntityIds.PantryLight);
             pantryLight.AddMotionSensor(sensors.KitchenMotionSensor);
+
+            Lights = ImmutableArray<LightGroup>.Empty.Add(kitchenLight).Add(pantryLight);
         }
+
+        public override string Name => "Kitchen Lights";
 
         public override async Task UpdateAsync()
         {

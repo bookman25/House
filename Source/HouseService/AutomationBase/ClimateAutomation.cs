@@ -6,13 +6,14 @@ using HouseService.Devices;
 using HouseService.ElasticSearch;
 using HouseService.Sensors;
 using HouseService.Services;
+using HouseService.ViewModels;
 using Microsoft.Extensions.Logging;
 
 namespace HouseService.AutomationBase
 {
     public abstract class ClimateAutomation : Automation
     {
-        public abstract string Name { get; }
+        public override AutomationType Type => AutomationType.Climate;
 
         protected Thermostat Thermostat { get; }
 
@@ -40,12 +41,12 @@ namespace HouseService.AutomationBase
             }
 
             var currentState = await Thermostat.GetCurrentStateAsync();
-            if (currentState.TargetTemperature != holdTemp && currentState.TargetTemperature != GetTimeBasedTargetTemperature())
+            CurrentTemp = currentState.CurrentTemperature;
+            if (currentState.TargetTemperature != HoldTemp && currentState.TargetTemperature != GetTimeBasedTargetTemperature())
             {
-                Logger.LogInformation($"[{Name}] Starting temperature hold. " +
-                    $"Holding at {currentState.TargetTemperature} until {DateTime.Now.Add(HoldDuration).ToShortTimeString()}");
-                holdStartTime = DateTime.UtcNow;
-                holdTemp = currentState.TargetTemperature;
+                HoldStartTime = DateTime.UtcNow;
+                HoldTemp = currentState.TargetTemperature;
+                Logger.LogInformation($"[{Name}] Starting temperature hold. Holding at {HoldTemp} until {HoldEndTime.GetValueOrDefault().ToShortTimeString()}");
             }
         }
 
@@ -53,13 +54,18 @@ namespace HouseService.AutomationBase
 
         private DateTime lastUpdate;
 
-        private DateTime? holdStartTime;
+        public DateTime? HoldStartTime { get; private set; }
 
-        private long? holdTemp;
+        public DateTime? HoldEndTime => HoldStartTime.GetValueOrDefault().Add(HoldDuration);
+
+        public long? HoldTemp { get; private set; }
+
+        public long? CurrentTemp { get; private set; }
 
         public override async Task UpdateAsync()
         {
             var state = await Thermostat.GetCurrentStateAsync();
+            CurrentTemp = state.CurrentTemperature;
             if (lastIndex.AddMinutes(1) < DateTime.UtcNow)
             {
                 lastIndex = DateTime.UtcNow;
@@ -67,12 +73,12 @@ namespace HouseService.AutomationBase
             }
 
             var newTargetTemp = GetTimeBasedTargetTemperature();
-            if (holdStartTime.HasValue)
+            if (HoldStartTime.HasValue)
             {
-                if (holdStartTime.GetValueOrDefault().Add(HoldDuration) < DateTime.UtcNow)
+                if (HoldStartTime.GetValueOrDefault().Add(HoldDuration) < DateTime.UtcNow)
                 {
-                    holdStartTime = null;
-                    holdTemp = null;
+                    HoldStartTime = null;
+                    HoldTemp = null;
                     Logger.LogInformation($"[{Name}] Ending temperature hold.");
                 }
                 else
@@ -97,11 +103,16 @@ namespace HouseService.AutomationBase
 
         protected ValueTask<bool> SetTemperatureAsync(int temp)
         {
-            if (holdStartTime != null)
+            if (HoldStartTime != null)
             {
                 return new ValueTask<bool>(false);
             }
             return Thermostat.SetTemperatureAsync(temp);
+        }
+
+        public override AutomationViewModel CreateViewModel()
+        {
+            return new ClimateAutomationViewModel(this);
         }
     }
 }

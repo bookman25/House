@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using HassSDK;
 using HouseService.AutomationBase;
 using HouseService.ElasticSearch;
-using HouseService.Sensors;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -16,11 +15,13 @@ namespace HouseService.Services
 {
     public class AutomationEngine : IHostedService, IDisposable
     {
-        private HassClient Client { get; }
-
         public ElasticSearchService ElasticSearch { get; }
 
         public HassioOptions Options { get; }
+
+        public ImmutableArray<Automation> Automations { get; }
+
+        private HassClient Client { get; }
 
         private HassService HassService { get; }
 
@@ -29,10 +30,6 @@ namespace HouseService.Services
         private ILogger<AutomationEngine> Logger { get; }
 
         private Timer Timer { get; set; }
-
-        private ImmutableArray<Automation> Automations { get; }
-
-        public ImmutableDictionary<string, Sensor> Sensors { get; } = ImmutableDictionary<string, Sensor>.Empty;
 
         public AutomationEngine(
             HassClient client,

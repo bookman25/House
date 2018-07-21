@@ -10,7 +10,7 @@ namespace HouseService.Automations
 {
     public class DownstairsClimate : ClimateAutomation
     {
-        public override string Name { get; } = "Downstairs Thermostat";
+        public override string Name => "Downstairs Climate";
 
         public DownstairsClimate(HassService hass, SensorService sensors, DownstairsThermostatIndex index, ILogger<DownstairsClimate> logger)
             : base(hass, EntityIds.DownstairsThermostatCooling, sensors.DownstairsThermostat, index, logger)
