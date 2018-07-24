@@ -16,7 +16,6 @@ namespace HouseService.Automations
             : base(hass)
         {
             light = new HueLight(hass, EntityIds.LivingRoomLight);
-            IsEnabled = false;
             Lights = ImmutableArray<LightGroup>.Empty.Add(light);
         }
 
@@ -24,16 +23,20 @@ namespace HouseService.Automations
 
         public override async Task UpdateAsync()
         {
-            var random = new Random();
-            await light.ChangeColorAsync(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255), brightness: 128);
+            //var random = new Random();
+            //await light.ChangeColorAsync(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255), brightness: 128);
 
-            if (DateTime.Now.DayOfWeek > DayOfWeek.Sunday && DateTime.Now.DayOfWeek < DayOfWeek.Saturday)
+            if (DateTime.Now.DayOfWeek >= DayOfWeek.Sunday && DateTime.Now.DayOfWeek < DayOfWeek.Friday)
             {
-                if (DateTime.Now.IsAfter("11:15am") && DateTime.Now.IsBefore("12:45pm"))
+                if (DateTime.Now.IsAfter("10:00pm"))
+                {
+                    await light.TurnOffAsync();
+                }
+                if (DateTime.Now.IsAfter("6:25am") && DateTime.Now.IsBefore("7:00am"))
                 {
                     await light.TurnOnAsync();
                 }
-                else
+                else if (DateTime.Now.IsAfter("7:00am") && DateTime.Now.IsBefore("7:01am"))
                 {
                     await light.TurnOffAsync();
                 }

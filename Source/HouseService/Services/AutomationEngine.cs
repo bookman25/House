@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using HassSDK;
@@ -90,7 +91,20 @@ namespace HouseService.Services
             {
                 using (LogHelper.PushRequestId("Main"))
                 {
-                    await Task.WhenAll(Automations.Where(i => i.IsEnabled).Select(i => i.UpdateAsync()));
+                    foreach (var a in Automations.Where(i => i.IsEnabled))
+                    {
+                        try
+                        {
+                            await a.UpdateAsync();
+                        }
+                        catch (HttpRequestException)
+                        {
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError(ex, $"{a.Name} failed");
+                        }
+                    }
                 }
             }
             finally

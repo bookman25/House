@@ -35,7 +35,7 @@ namespace HouseService.AutomationBase
 
         private async void Sensor_OnChanged(object sender, EventData e)
         {
-            if (lastUpdate.AddSeconds(5) > DateTime.UtcNow)
+            if (lastUpdate.AddSeconds(5) > DateTime.Now)
             {
                 return;
             }
@@ -44,7 +44,7 @@ namespace HouseService.AutomationBase
             CurrentTemp = currentState.CurrentTemperature;
             if (currentState.TargetTemperature != HoldTemp && currentState.TargetTemperature != GetTimeBasedTargetTemperature())
             {
-                HoldStartTime = DateTime.UtcNow;
+                HoldStartTime = DateTime.Now;
                 HoldTemp = currentState.TargetTemperature;
                 Logger.LogInformation($"[{Name}] Starting temperature hold. Holding at {HoldTemp} until {HoldEndTime.GetValueOrDefault().ToShortTimeString()}");
             }
@@ -66,16 +66,16 @@ namespace HouseService.AutomationBase
         {
             var state = await Thermostat.GetCurrentStateAsync();
             CurrentTemp = state.CurrentTemperature;
-            if (lastIndex.AddMinutes(1) < DateTime.UtcNow)
+            if (lastIndex.AddMinutes(1) < DateTime.Now)
             {
-                lastIndex = DateTime.UtcNow;
+                lastIndex = DateTime.Now;
                 await Index.IndexItemAsync(state);
             }
 
             var newTargetTemp = GetTimeBasedTargetTemperature();
             if (HoldStartTime.HasValue)
             {
-                if (HoldStartTime.GetValueOrDefault().Add(HoldDuration) < DateTime.UtcNow)
+                if (HoldStartTime.GetValueOrDefault().Add(HoldDuration) < DateTime.Now)
                 {
                     HoldStartTime = null;
                     HoldTemp = null;
@@ -90,7 +90,7 @@ namespace HouseService.AutomationBase
             if (await SetTemperatureAsync(newTargetTemp))
             {
                 Logger.LogTrace("Temperature successfully set to {newTargetTemp}", newTargetTemp);
-                lastUpdate = DateTime.UtcNow;
+                lastUpdate = DateTime.Now;
             }
         }
 

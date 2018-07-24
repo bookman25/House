@@ -27,11 +27,11 @@ namespace HouseService.Automations
                 case DayOfWeek.Thursday:
                     if (date.IsBefore("3:00am"))
                     {
-                        return 74;
+                        return 75;
                     }
                     else if (date.IsBefore("4:00am"))
                     {
-                        return 75;
+                        return 76;
                     }
                     else if (date.IsBefore("6:00am"))
                     {
