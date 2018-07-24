@@ -31,5 +31,8 @@ namespace HouseService
 
         [NotNull]
         public const string LivingRoomLight = "light.living_room";
+
+        [NotNull]
+        public const string ComputerMonitor = "switch.computer_monitor";
     }
 }

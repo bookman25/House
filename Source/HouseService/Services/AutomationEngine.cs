@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HassSDK;
 using HouseService.AutomationBase;
+using HouseService.Devices;
 using HouseService.ElasticSearch;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -46,10 +47,12 @@ namespace HouseService.Services
             Options = configuration.GetSection("Hassio").Get<HassioOptions>();
             SubscriptionClient = subscriptionClient;
             Logger = logger;
-            HassService = HassService;
+            HassService = hassService;
             LogHelper.DefaultLogger = logger;
 
             Automations = automations.ToImmutableArray();
+
+            var computer = new Computer(HassService, EntityIds.ComputerMonitor);
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
