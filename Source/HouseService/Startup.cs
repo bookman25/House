@@ -16,7 +16,8 @@ using HouseService.Automations;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights.Extensibility;
 using HouseService.ElasticSearch;
-using HouseService.ViewModels;
+using HouseService.Api.Models;
+using HouseService.Api.Repositories;
 
 namespace HouseService
 {
@@ -37,6 +38,7 @@ namespace HouseService
             TelemetryConfiguration.Active.DisableTelemetry = true;
 
             services.AddMvc();
+            services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.Populate(services);
@@ -90,6 +92,7 @@ namespace HouseService
             AddSingleton<ElasticIndex, DownstairsThermostatIndex, DownstairsThermostatIndex>(services);
             AddSingleton<ElasticIndex, UpstairsThermostatIndex, UpstairsThermostatIndex>(services);
 
+            AddSingleton<AutomationRepository>(services);
             AddSingleton<WebViewModel>(services);
         }
 

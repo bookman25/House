@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using HouseService.Services;
 
-namespace HouseService.ViewModels
+namespace HouseService.Api.Models
 {
-    public class WebViewModel
+    public class WebViewModel : ODataObject
     {
         private readonly AutomationEngine engine;
 

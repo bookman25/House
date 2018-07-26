@@ -11,6 +11,8 @@ namespace HouseService.Automations
     {
         public override string Name { get; } = "Upstairs Climate";
 
+        public override string Id => "upstairs.climate";
+
         public UpstairsClimate(HassService hass, SensorService sensors, UpstairsThermostatIndex index, ILogger<UpstairsClimate> logger)
             : base(hass, EntityIds.UpstairsThermostatCooling, sensors.UpstairsThermostat, index, logger)
         {

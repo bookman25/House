@@ -4,7 +4,7 @@ using System.Linq;
 using HouseService.AutomationBase;
 using HouseService.Devices;
 
-namespace HouseService.ViewModels
+namespace HouseService.Api.Models
 {
     public class LightAutomationViewModel : AutomationViewModel
     {

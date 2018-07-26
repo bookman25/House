@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Immutable;
+using HouseService.Api.Models;
 using HouseService.Devices;
 using HouseService.Services;
-using HouseService.ViewModels;
 
 namespace HouseService.AutomationBase
 {

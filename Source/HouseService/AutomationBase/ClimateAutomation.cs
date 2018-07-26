@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using HassSDK;
 using HassSDK.Models;
+using HouseService.Api.Models;
 using HouseService.Devices;
 using HouseService.ElasticSearch;
 using HouseService.Sensors;
 using HouseService.Services;
-using HouseService.ViewModels;
 using Microsoft.Extensions.Logging;
 
 namespace HouseService.AutomationBase

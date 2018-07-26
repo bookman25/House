@@ -29,6 +29,8 @@ namespace HouseService.Automations
 
         public override string Name => "Kitchen Lights";
 
+        public override string Id => "kitchen.lights";
+
         public override async Task UpdateAsync()
         {
             var kitchenLevels = GetTimeBasedLevels(kitchenLight);

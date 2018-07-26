@@ -1,7 +1,7 @@
 ﻿using System;
 using HouseService.AutomationBase;
 
-namespace HouseService.ViewModels
+namespace HouseService.Api.Models
 {
     public class ClimateAutomationViewModel : AutomationViewModel
     {

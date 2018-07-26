@@ -33,6 +33,8 @@ namespace HouseService.Services
 
         private Timer Timer { get; set; }
 
+        private Computer computer;
+
         public AutomationEngine(
             HassClient client,
             HassService hassService,
@@ -52,7 +54,7 @@ namespace HouseService.Services
 
             Automations = automations.ToImmutableArray();
 
-            var computer = new Computer(HassService, EntityIds.ComputerMonitor);
+            computer = new Computer(HassService, EntityIds.ComputerMonitor);
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)

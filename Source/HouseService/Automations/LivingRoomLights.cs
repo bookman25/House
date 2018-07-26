@@ -21,6 +21,8 @@ namespace HouseService.Automations
 
         public override string Name => "Living Room Lights";
 
+        public override string Id => "livingroom.lights";
+
         public override async Task UpdateAsync()
         {
             //var random = new Random();

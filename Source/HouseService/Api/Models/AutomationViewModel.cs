@@ -1,13 +1,14 @@
 ﻿using System;
 using HouseService.AutomationBase;
 
-namespace HouseService.ViewModels
+namespace HouseService.Api.Models
 {
-    public class AutomationViewModel
+    public abstract class AutomationViewModel : ODataObject
     {
         private readonly Automation automation;
 
-        public AutomationViewModel(Automation automation)
+        protected AutomationViewModel(Automation automation)
+            : base(automation.Id)
         {
             this.automation = automation;
 

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using HassSDK;
+using HouseService.Api.Models;
 using HouseService.Services;
-using HouseService.ViewModels;
 
 namespace HouseService.AutomationBase
 {
@@ -16,6 +16,8 @@ namespace HouseService.AutomationBase
         protected HassService HassService { get; }
 
         protected HassClient Client => HassService.Client;
+
+        public abstract string Id { get; }
 
         public abstract string Name { get; }
 
