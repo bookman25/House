@@ -11,10 +11,9 @@ interface DashboardState {
 }
 
 export class Home extends React.Component<RouteComponentProps<{}>, DashboardState> {
-    constructor() {
-        super();
-        this.state = { automations: [], loading: true };
-
+    public state: DashboardState = { automations: [], loading: true };
+    
+    public componentDidMount() {
         this.refresh();
     }
 
